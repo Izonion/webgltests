@@ -8,7 +8,7 @@ const FAR = 10000;
 
 const container = document.querySelector('#glCanvas');
 
-const mainScene = {
+const main = {
 	renderer: new THREE.WebGLRenderer(),
 	camera: new THREE.PerspectiveCamera(
 																			VIEW_ANGLE,
@@ -16,45 +16,49 @@ const mainScene = {
 																			NEAR,
 																			FAR
 																		),
-	scene: new THREE.Scene()
-}
+	scene: new THREE.Scene(),
+	render: function () {
+		this.renderer.render(this.scene, this.camera);
+	},
+	clock: new THREE.Clock()
+};
 
-scene.add(camera);
+main.scene.add(main.camera);
 
-renderer.setSize(WIDTH, HEIGHT);
+main.renderer.setSize(WIDTH, HEIGHT);
 
-container.appendChild(renderer.domElement);
+container.appendChild(main.renderer.domElement);
 
-const sphere = {
-	radius: 50,
-	segments: 16,
-	rings: 16,
-	material: new THREE.MeshLambertMaterial(
-		{
-			color: 0xCC000
-		}),
-	mesh: new THREE.Mesh(
+const sphere = new THREE.Mesh(
 		new THREE.SphereGeometry(
-			RADIUS,
-			SEGMENTS,
-			RINGS),
-		sphereMaterial)
-}
+			50,   //radius
+			16,   //segments
+			16),  //rings
+		new THREE.MeshLambertMaterial(
+			{
+				color: 0xCC0000
+			}));
+
+console.log(sphere.geometry);
 
 sphere.position.z = -300;
 
-scene.add(sphere);
+main.scene.add(sphere);
 
-const pointLight = new THREE.PointLight(0xFFFFFF);
+const sun = new THREE.DirectionalLight(0xFFFFFF);
 
-pointLight.position.x = 10;
-pointLight.position.y = 50;
-pointLight.position.z = 130;
+sun.position.x = 10;
+sun.position.y = 50;
+sun.position.z = 130;
 
-scene.add(pointLight);
+main.scene.add(sun);
+
+const ambient = new THREE.AmbientLight(0x101010);
+main.scene.add(ambient);
 
 function update () {
-	renderer.render(scene, camera);
+	main.render();
+	sun.position.x = Math.cos(main.clock.elapsedTime) * 100;
 	requestAnimationFrame(update);
 }
 requestAnimationFrame(update);
